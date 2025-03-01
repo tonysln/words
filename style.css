@@ -45,6 +45,10 @@ dialog {
 	max-width: 620px;
 }
 
+body {
+ 	background-color: #d9e0e0;
+ }
+
 #dialog-play-btn {
 	padding: 0.3em 0.8em;
 }
@@ -52,14 +56,16 @@ dialog {
 .wrapper {
 	max-width: 1080px;
 	margin: 0 auto;
-	padding-left: 0.75em;
-	padding-right: 0.75em;
+	padding: 1.15em;
+	background-color: #fafafa;
+	-webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 0;
+    -moz-box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 0;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 0;
 }
 
 .wrapper h1 {
 	font-size: 150%;
-	margin-top: 0.5em;
-	margin-bottom: 1em;
+	padding-bottom: 1em;
 }
 
 .two-col {
