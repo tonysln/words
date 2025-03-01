@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>How Many Words Can You Name?</title>
+
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+
+<dialog id="new-game-popup">
+  	<p>Start New Game Room</p>
+  	<br><br>
+
+  	<div>
+		<p>Room ID:</p>
+		<p><strong id="dialog-new-id">#29520021</strong></p>
+
+		<br>
+
+		<label for="dialog-wordlist">Wordlist:</label>
+
+		<br>
+		<select name="wordlist" id="dialog-wordlist">
+		  <option value="frequency_list_50k">frequency_list_50k</option>
+		</select>
+
+		<br><br>
+		<p>Difficulty:</p>
+		<div>
+		  	<input type="range" min="1" max="100" value="20" class="slider" id="dialog-difficulty">
+		  	<label for="dialog-difficulty" id="dialog-difficulty-label"></label>
+		</div>
+	</div>
+
+  	<br>
+  	<div>
+  		<small style="opacity: 0.8;">
+  			<p>You will be able to share your Room ID with friends to play together.</p>
+  			<p>The higher the difficulty, the more obscure and rare dictionary words are included.</p>
+  			<p>The game ends after 24 hours of inactivity!</p>
+  		</small>
+  	</div>
+
+  	<br>
+
+  	<form method="dialog">
+    	<button id="dialog-play-btn">Play</button>
+  	</form>
+</dialog>
+
+<div class="wrapper" id="main-screen">
+	<h1>How Many Words Can You Name?</h1>
+
+	<main class="two-col">
+		<div class="col">
+			<div class="big-input">
+				<!-- <label for="word-input">Word:</label> -->
+				<input type="text" name="" id="word-input">
+			</div>
+
+			<br>
+
+			<div id="content">
+				
+			</div>
+		</div>
+
+		<div class="col col-side">
+			<span><h2><strong id="time-left">-</strong></h2><small>hours left</small></span>
+
+			<br><br>
+			<div>
+				<p>Room ID:</p>
+				<p><strong id="room-id">-</strong></p>
+				<p><small><a href="#">Share With Friends</a></small></p>
+			</div>
+
+			<br><br>
+			<div class="stats">
+				<p>Total words:</p>
+				<p><span id="got-words">-</span> / <span id="total-words">-</span> (<span id="words-percent">-</span>%)</p>
+
+				<!-- <br>
+				<p>Letters:</p>
+				<p>0 / 26</p> -->
+
+				<br>
+				<p>Wrong:</p>
+				<p id="wrong-words">-</p>
+
+				<br>
+				<p>Players:</p>
+				<p>1</p>
+			</div>
+
+			<br><br>
+			<div class="wordlist-info">
+				<p>Wordlist:</p>
+				<p><code id="selected-wordlist">-</code></p>
+
+				<br>
+				<p>Difficulty:</p>
+				<p id="selected-difficulty">-</p>
+			</div>
+
+			<br><br>
+			<div>
+				<p><small><a href="#">End Game</a></small></p>
+				<p><small><a href="#" id="reset-room">Reset</a></small></p>
+				<p><small><a href="#">About</a></small></p>
+			</div>
+		</div>
+	</main>
+</div>
+
+<script type="text/javascript" src="meta.js"></script>
+<script type="text/javascript" src="app.js"></script>
+</body>
+</html>

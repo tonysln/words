@@ -1,0 +1,113 @@
+html, body, * {
+	margin: 0;
+	box-sizing: border-box;
+	font-family: "Verdana";
+}
+
+body, h1, h2, h3, h4, h5, h6, p, ol, ul {
+  	margin: 0;
+  	padding: 0;
+  	font-weight: normal;
+}
+
+ol, ul {
+  	list-style: none;
+}
+
+img {
+  	max-width: 100%;
+  	height: auto;
+}
+
+a {
+	text-decoration: none;
+	color: 	#0645ad;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:visited {
+	color: #0645ad;
+}
+
+code {
+	font-family: monospace;
+}
+
+dialog {
+	z-index: 1000;
+	margin: 5em auto 0 auto;
+	padding: 1.5em 1.75em;
+	border: 1px solid rgb(130, 130, 130);
+	background: white;
+	max-width: 620px;
+}
+
+#dialog-play-btn {
+	padding: 0.3em 0.8em;
+}
+
+.wrapper {
+	max-width: 1080px;
+	margin: 0 auto;
+	padding-left: 0.75em;
+	padding-right: 0.75em;
+}
+
+.wrapper h1 {
+	font-size: 150%;
+	margin-top: 0.5em;
+	margin-bottom: 1em;
+}
+
+.two-col {
+	display: grid;
+	grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+	grid-column-gap: 2em;
+}
+
+.two-col .col-side {
+	border-left: 1px solid rgb(170, 170, 170);
+	padding-left: 1em;
+}
+
+.two-col .col-side h2 {
+	display: inline-block;
+	padding-right: 0.3em;
+}
+
+.wb-inner {
+	padding: 0.2em 0.2em 0.2em 0.6em;
+  	display: flex;
+  	flex-wrap: wrap;
+}
+
+.wb {
+	padding-bottom: 0.75em;
+}
+
+.wb h3 {
+	font-weight: bold;
+	display: inline-block;
+}
+
+.wb small {
+	opacity: 0.6;
+	padding-left: 0.3em;
+}
+
+.big-input {
+	text-align: left;
+}
+
+#word-input {
+	padding: 0.2em;
+	font-size: 105%;
+	width: 100%;
+}
+
+.word {
+	padding: 0.1em 0.3em;
+}
