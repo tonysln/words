@@ -4,15 +4,17 @@ let wordInput = document.getElementById('word-input');
 let mainScreen = document.getElementById('main-screen');
 
 
-// TODO refactor currentRoom out as it's currently the main global
-// object, referenced by most functions 
+
+// TODO need a neater way to manage state
+// TODO scoring system: based on word frequency/rarity+length+..?
 let currentRoom = {
-	// Default dummy room before loading from memory
+	// Default dummy room before loading from storage/populating from dialog
 	starttime: null,
 	updtime: null,
 	endtime: null,
 	room_ID: "", 
 	wordlist: "frequency_list_50k", 
+	letter_freqs: {},
 	difficulty: 100.0,
 	got_words: 0,
 	total_words: 0,
@@ -61,6 +63,8 @@ wordInput.addEventListener('keydown', function (e) {
 
       	targetBox.appendChild(nw);
       	wordInput.value = '';
+
+      	updateLocalStorage(); // very costly (or will be in the future!)
     }
 });
 
@@ -83,7 +87,7 @@ function loadLettersArea() {
 
 		const sc = document.createElement('span');
 		const ct = document.createElement('small');
-		ct.textContent = '(0/' + wordlist_meta[currentRoom.wordlist][letter] + ')';
+		ct.textContent = '(' + currentRoom.letter_freqs[letter] + '/' + wordlist_meta[currentRoom.wordlist][letter] + ')';
 		const s = document.createElement('h3');
 	  	s.textContent = letter.toUpperCase();
 
@@ -105,6 +109,7 @@ function checkGameRoomExists() {
 	} else {
 		setUpExistingRoom(roomID);
 		loadLettersArea();
+		loadWordList();
 	}
 }
 
@@ -129,30 +134,36 @@ function finalizeNewRoom() {
 	currentRoom.wordlist = document.getElementById('dialog-wordlist').value;
 	currentRoom.difficulty = dDifficultySlider.value;
 
-	loadWordList();
+	currentRoom.total_words = wordlist_meta[currentRoom.wordlist]['_total'];
+	currentRoom.letter_freqs = Object.fromEntries(Object.entries(wordlist_meta[currentRoom.wordlist]).map(([k,v]) => [k,0]));
+	console.log(currentRoom.letter_freqs);
+
 	populateLocalStorage();
 }
 
 function setUpExistingRoom(roomID) {
 	wordInput.focus();
 	roomIdText.textContent = roomID;
-	roomWordlistText.textContent = localStorage.getItem("wordlist");
-	roomDifficultyText.textContent = localStorage.getItem("difficulty") + '%';
+
+	currentRoom = JSON.parse(localStorage.getItem("room"));
+
+	roomWordlistText.textContent = currentRoom.wordlist;
+	roomDifficultyText.textContent = currentRoom.difficulty + '%';
 
 	currentRoom.updtime = new Date(Date.now());
-	const t1 = new Date(localStorage.getItem('endtime'));
+	const t1 = new Date(currentRoom.endtime);
 	const dt = Math.round(Math.abs(currentRoom.updtime.getTime() - t1.getTime()) / 3600000);
 	if (dt > 1)
 		roomTimeLeftText.textContent = dt;
 	else
 		roomTimeLeftText.textContent = '<1'
 
-	const gw = parseInt(localStorage.getItem('got_words'));
-	const tw = parseInt(localStorage.getItem('total_words'));
+	const gw = parseInt(currentRoom.got_words);
+	const tw = parseInt(currentRoom.total_words);
 	roomGotWords.textContent = gw;
 	roomTotalWords.textContent = tw;
 	roomWordsPercent.textContent = Math.round((gw/tw)*100);
-	roomWrongWords.textContent = localStorage.getItem('wrong_words');
+	roomWrongWords.textContent = currentRoom.wrong_words;
 }
 
 function getBadRandomID(length = 8) {
@@ -165,29 +176,22 @@ function getBadRandomID(length = 8) {
 
 function populateLocalStorage() {
 	localStorage.setItem("room_ID", currentRoom.room_ID);
-	localStorage.setItem("wordlist", currentRoom.wordlist);
-	localStorage.setItem("difficulty", currentRoom.difficulty);
-	localStorage.setItem("got_words", currentRoom.got_words);
-	localStorage.setItem("total_words", currentRoom.total_words);
-	localStorage.setItem("wrong_words", currentRoom.wrong_words);
-	localStorage.setItem("starttime", currentRoom.starttime);
-	localStorage.setItem("updtime", currentRoom.updtime);
-	localStorage.setItem("endtime", currentRoom.endtime);
+	localStorage.setItem("room", JSON.stringify(currentRoom));
+}
+
+function updateLocalStorage() {
+	localStorage.setItem("room", JSON.stringify(currentRoom));
 }
 
 function loadWordList() {
 	// TODO set up tree
-	const wlist = currentRoom.wordlist + '.txt';
-
-	fetch(wlist)
+	fetch(currentRoom.wordlist + '.txt')
 	  .then((res) => res.text())
 	  .then((text) => {
 	  		// TODO filter out up to difficulty% for each letter
 	    	console.log(wordlist_meta[currentRoom.wordlist]);
 	   })
 	  .catch((e) => console.error(e));
-
-	currentRoom.total_words = wordlist_meta[currentRoom.wordlist]['_total'];
 }
 
 checkGameRoomExists();
