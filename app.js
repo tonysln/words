@@ -14,7 +14,7 @@ let currentRoom = {
 	endtime: null,
 	room_ID: "", 
 	wordlist: "frequency_list_50k", 
-	letter_freqs: {},
+	guessed_words: {},
 	difficulty: 100.0,
 	got_words: 0,
 	total_words: 0,
@@ -22,6 +22,8 @@ let currentRoom = {
 	wrong_words: 0,
 	players: ['localhost']
 };
+
+let currentWordListRaw = null;
 
 // Side panel
 let roomIdText = document.getElementById('room-id');
@@ -56,15 +58,20 @@ document.getElementById('dialog-play-btn').addEventListener("click", (e) => {
 wordInput.addEventListener('keydown', function (e) {
 	let w = wordInput.value.toLowerCase();
     if (e.key === 'Enter' && w) {
-      	const targetBox = document.getElementById(w.charAt(0));
-      	const nw = document.createElement('span');
-      	nw.innerText = w;
-      	nw.classList.add('word');
+    	if (currentWordListRaw.includes(w)) {
+	      	const targetletter = w.charAt(0);
 
-      	targetBox.appendChild(nw);
-      	wordInput.value = '';
+	      	currentRoom.guessed_words[targetletter].push(w);
+	      	currentRoom.got_words += 1;
 
-      	updateLocalStorage(); // very costly (or will be in the future!)
+	      	drawNewWord(document.getElementById(targetletter), w);
+	    } else {
+	    	currentRoom.wrong_words += 1;
+	    }
+
+	    updateLocalStorage(); // very costly (or will be in the future!)
+	    loadExistingRoomInfo(currentRoom.room_ID); // need that state management upgrade
+	    wordInput.value = '';
     }
 });
 
@@ -75,7 +82,15 @@ resetRoomButton.addEventListener("click", (e) => {
 });
 
 
-function loadLettersArea() {
+function drawNewWord(target, w) {
+	const nw = document.createElement('span');
+  	nw.innerText = w;
+  	nw.classList.add('word');
+  	target.appendChild(nw);
+}
+
+
+function loadWordsVizArea() {
 	const AZ = Object.keys(wordlist_meta[currentRoom.wordlist]).sort().slice(1).join('');
 	for (const letter of AZ) {
 		const ndp = document.createElement('div');
@@ -87,7 +102,7 @@ function loadLettersArea() {
 
 		const sc = document.createElement('span');
 		const ct = document.createElement('small');
-		ct.textContent = '(' + currentRoom.letter_freqs[letter] + '/' + wordlist_meta[currentRoom.wordlist][letter] + ')';
+		ct.textContent = '(' + currentRoom.guessed_words[letter].length + '/' + wordlist_meta[currentRoom.wordlist][letter] + ')';
 		const s = document.createElement('h3');
 	  	s.textContent = letter.toUpperCase();
 
@@ -96,6 +111,10 @@ function loadLettersArea() {
 	  	ndp.appendChild(sc);
 	  	ndp.appendChild(nd);
 	  	content.appendChild(ndp);
+
+	  	for (const word of currentRoom.guessed_words[letter]) {
+	  		drawNewWord(document.getElementById(letter), word);
+	  	}
 	}
 }
 
@@ -107,8 +126,8 @@ function checkGameRoomExists() {
 		currentRoom.room_ID = getBadRandomID();
 		dNewId.innerText = currentRoom.room_ID;
 	} else {
-		setUpExistingRoom(roomID);
-		loadLettersArea();
+		loadExistingRoomInfo(roomID);
+		loadWordsVizArea();
 		loadWordList();
 	}
 }
@@ -135,13 +154,13 @@ function finalizeNewRoom() {
 	currentRoom.difficulty = dDifficultySlider.value;
 
 	currentRoom.total_words = wordlist_meta[currentRoom.wordlist]['_total'];
-	currentRoom.letter_freqs = Object.fromEntries(Object.entries(wordlist_meta[currentRoom.wordlist]).map(([k,v]) => [k,0]));
-	console.log(currentRoom.letter_freqs);
+	currentRoom.guessed_words = Object.fromEntries(Object.entries(wordlist_meta[currentRoom.wordlist]).map(([k,v]) => [k, []]));
+	console.log(currentRoom.guessed_words)
 
 	populateLocalStorage();
 }
 
-function setUpExistingRoom(roomID) {
+function loadExistingRoomInfo(roomID) {
 	wordInput.focus();
 	roomIdText.textContent = roomID;
 
@@ -162,7 +181,7 @@ function setUpExistingRoom(roomID) {
 	const tw = parseInt(currentRoom.total_words);
 	roomGotWords.textContent = gw;
 	roomTotalWords.textContent = tw;
-	roomWordsPercent.textContent = Math.round((gw/tw)*100);
+	roomWordsPercent.textContent = ((gw/tw)*100).toFixed(2);
 	roomWrongWords.textContent = currentRoom.wrong_words;
 }
 
@@ -175,6 +194,7 @@ function getBadRandomID(length = 8) {
 }
 
 function populateLocalStorage() {
+	currentRoom.updtime = new Date(Date.now());
 	localStorage.setItem("room_ID", currentRoom.room_ID);
 	localStorage.setItem("room", JSON.stringify(currentRoom));
 }
@@ -184,12 +204,16 @@ function updateLocalStorage() {
 }
 
 function loadWordList() {
-	// TODO set up tree
+	// TODO set up tree 
+	// subtree for each letter?
 	fetch(currentRoom.wordlist + '.txt')
 	  .then((res) => res.text())
 	  .then((text) => {
 	  		// TODO filter out up to difficulty% for each letter
 	    	console.log(wordlist_meta[currentRoom.wordlist]);
+
+	    	// ugly way to test this for now, string lookup lol
+	    	currentWordListRaw = text;
 	   })
 	  .catch((e) => console.error(e));
 }
