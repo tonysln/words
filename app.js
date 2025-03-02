@@ -58,14 +58,15 @@ document.getElementById('dialog-play-btn').addEventListener("click", (e) => {
 wordInput.addEventListener('keydown', function (e) {
 	let w = wordInput.value.toLowerCase();
     if (e.key === 'Enter' && w) {
-    	if (currentWordListRaw.includes(w)) {
-	      	const targetletter = w.charAt(0);
+    	const targetletter = w.charAt(0);
+    	const wordIsValid = currentWordListRaw.includes(w);
+    	const wordIsNew = !currentRoom.guessed_words[targetletter].includes(w);
 
+    	if (wordIsValid && wordIsNew) {
 	      	currentRoom.guessed_words[targetletter].push(w);
 	      	currentRoom.got_words += 1;
-
 	      	drawNewWord(document.getElementById(targetletter), w);
-	    } else {
+	    } else if (wordIsNew) {
 	    	currentRoom.wrong_words += 1;
 	    }
 
@@ -155,7 +156,6 @@ function finalizeNewRoom() {
 
 	currentRoom.total_words = wordlist_meta[currentRoom.wordlist]['_total'];
 	currentRoom.guessed_words = Object.fromEntries(Object.entries(wordlist_meta[currentRoom.wordlist]).map(([k,v]) => [k, []]));
-	console.log(currentRoom.guessed_words)
 
 	populateLocalStorage();
 }

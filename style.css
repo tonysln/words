@@ -1,7 +1,7 @@
 html, body, * {
 	margin: 0;
 	box-sizing: border-box;
-	font-family: "Verdana";
+	font-family: "Tahoma";
 }
 
 body, h1, h2, h3, h4, h5, h6, p, ol, ul {
@@ -51,6 +51,10 @@ body {
 
 #dialog-play-btn {
 	padding: 0.3em 0.8em;
+}
+
+#content span {
+	font-family: "Georgia";
 }
 
 .wrapper {
