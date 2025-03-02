@@ -23,7 +23,7 @@
 
 		<br>
 		<select name="wordlist" id="dialog-wordlist">
-		  <option value="frequency_list_50k">frequency_list_50k</option>
+		  <option value="frequency_en_50k">frequency_en_50k</option>
 		</select>
 
 		<br><br>
@@ -53,11 +53,12 @@
 <div class="wrapper" id="main-screen">
 	<h1>How Many Words Can You Name?</h1>
 
-	<main class="two-col">
+	<div class="two-col">
 		<div class="col">
 			<div class="big-input">
 				<!-- <label for="word-input">Word:</label> -->
 				<input type="text" name="" id="word-input">
+				<small><a href="#" id="enter-word">Enter</a></small>
 			</div>
 
 			<br>
@@ -68,51 +69,54 @@
 		</div>
 
 		<div class="col col-side">
-			<span><h2><strong id="time-left">-</strong></h2><small>hours left</small></span>
+			<div class="col-side-inner">
+				<span><h2><strong id="time-left">-</strong></h2><small>hours left</small></span>
 
-			<br><br>
-			<div>
-				<p>Room ID:</p>
-				<p><strong id="room-id">-</strong></p>
-				<p><small><a href="#">Share With Friends</a></small></p>
-			</div>
+				<br><br>
+				<div>
+					<p>Room ID:</p>
+					<p><strong id="room-id">-</strong></p>
+					<p><small><a href="#">Share With Friends</a></small></p>
+				</div>
 
-			<br><br>
-			<div class="stats">
-				<p>Total words:</p>
-				<p><span id="got-words">-</span> / <span id="total-words">-</span> (<span id="words-percent">-</span>%)</p>
+				<br><br>
+				<div class="stats">
+					<p>Total words:</p>
+					<p><span id="got-words">-</span> / <span id="total-words">-</span> (<span id="words-percent">-</span>%)</p>
 
-				<!-- <br>
-				<p>Letters:</p>
-				<p>0 / 26</p> -->
+					<!-- <br>
+					<p>Letters:</p>
+					<p>0 / 26</p> -->
 
-				<br>
-				<p>Incorrect:</p>
-				<p id="wrong-words">-</p>
+					<br>
+					<p>Incorrect:</p>
+					<p id="wrong-words">-</p>
 
-				<br>
-				<p>Players:</p>
-				<p>1</p>
-			</div>
+					<br>
+					<p>Players:</p>
+					<p>1</p>
+				</div>
 
-			<br><br>
-			<div class="wordlist-info">
-				<p>Wordlist:</p>
-				<p><code id="selected-wordlist">-</code></p>
+				<br><br>
+				<div class="wordlist-info">
+					<p>Wordlist:</p>
+					<p><code id="selected-wordlist">-</code></p>
 
-				<br>
-				<p>Difficulty:</p>
-				<p id="selected-difficulty">-</p>
-			</div>
+					<br>
+					<p>Difficulty:</p>
+					<p id="selected-difficulty">-</p>
+				</div>
 
-			<br><br>
-			<div>
-				<p><small><a href="#">End Game</a></small></p>
-				<p><small><a href="#" id="reset-room">Reset</a></small></p>
-				<p><small><a href="#">About</a></small></p>
+				<br><br>
+				<div>
+					<p><small><a href="#">End Game</a></small></p>
+					<p><small><a href="#" id="reset-room">Reset</a></small></p>
+					<p><small><a href="#" id="export-room">Export</a></small></p>
+					<p><small><a href="#">About</a></small></p>
+				</div>
 			</div>
 		</div>
-	</main>
+	</div>
 </div>
 
 <script type="text/javascript" src="meta.js"></script>

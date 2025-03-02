@@ -13,7 +13,7 @@ let currentRoom = {
 	updtime: null,
 	endtime: null,
 	room_ID: "", 
-	wordlist: "frequency_list_50k", 
+	wordlist: "frequency_en_50k", 
 	guessed_words: {},
 	difficulty: 100.0,
 	got_words: 0,
@@ -35,6 +35,9 @@ let roomTotalWords = document.getElementById('total-words');
 let roomWordsPercent = document.getElementById('words-percent');
 let roomWrongWords = document.getElementById('wrong-words');
 let resetRoomButton = document.getElementById('reset-room');
+let exportRoomButton = document.getElementById('export-room');
+
+let enterWordButton = document.getElementById('enter-word');
 
 // New game pop dialog
 let popup = document.getElementById('new-game-popup');
@@ -55,9 +58,35 @@ document.getElementById('dialog-play-btn').addEventListener("click", (e) => {
 
 
 // Process entered words
-wordInput.addEventListener('keydown', function (e) {
+enterWordButton.addEventListener('click', (e) => {
+	processWordEntry(e);
+});
+
+wordInput.addEventListener('keydown', (e) => {
+	if (e.key === 'Enter')
+		processWordEntry(e);
+});
+
+resetRoomButton.addEventListener('click', (e) => {
+  	e.preventDefault();
+
+  	if (window.confirm("Are you sure you want to reset the game?")) {
+  		localStorage.clear();
+  		location.reload();
+  	}
+});
+
+exportRoomButton.addEventListener('click', (e) => {
+  	e.preventDefault();
+  	console.log(localStorage.getItem("room"));
+});
+
+
+function processWordEntry(e) {
+	e.preventDefault();
+
 	let w = wordInput.value.toLowerCase();
-    if (e.key === 'Enter' && w) {
+    if (w) {
     	const targetletter = w.charAt(0);
     	const wordIsValid = currentWordListRaw.includes(w);
     	const wordIsNew = !currentRoom.guessed_words[targetletter].includes(w);
@@ -66,6 +95,8 @@ wordInput.addEventListener('keydown', function (e) {
 	      	currentRoom.guessed_words[targetletter].push(w);
 	      	currentRoom.got_words += 1;
 	      	drawNewWord(document.getElementById(targetletter), w);
+	      	// Update timeout
+	      	currentRoom.endtime = new Date(Date.now() + (60 * 60 * 24 * 1000));
 	    } else if (wordIsNew) {
 	    	currentRoom.wrong_words += 1;
 	    }
@@ -74,13 +105,7 @@ wordInput.addEventListener('keydown', function (e) {
 	    loadExistingRoomInfo(currentRoom.room_ID); // need that state management upgrade
 	    wordInput.value = '';
     }
-});
-
-resetRoomButton.addEventListener("click", (e) => {
-  	e.preventDefault();
-  	localStorage.clear();
-  	location.reload();
-});
+}
 
 
 function drawNewWord(target, w) {
