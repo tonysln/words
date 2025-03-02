@@ -6,7 +6,7 @@ let mainScreen = document.getElementById('main-screen');
 
 
 // TODO need a neater way to manage state
-// TODO scoring system: based on word frequency/rarity+length+..?
+// TODO radix/prefix tree for wordlists
 let currentRoom = {
 	// Default dummy room before loading from storage/populating from dialog
 	starttime: null,
@@ -20,7 +20,8 @@ let currentRoom = {
 	total_words: 0,
 	language: 'en',
 	wrong_words: 0,
-	players: ['localhost']
+	players: ['localhost'],
+	score: 0.0
 };
 
 let currentWordListRaw = null;
@@ -85,16 +86,16 @@ exportRoomButton.addEventListener('click', (e) => {
 function processWordEntry(e) {
 	e.preventDefault();
 
-	let w = wordInput.value.toLowerCase();
+	let w = wordInput.value.trim().toLowerCase();
     if (w) {
-    	const targetletter = w.charAt(0);
-    	const wordIsValid = currentWordListRaw.includes(w);
-    	const wordIsNew = !currentRoom.guessed_words[targetletter].includes(w);
+    	const letter = w.charAt(0);
+    	const wordIsValid = wordlist_full[currentRoom.wordlist][letter].includes(w);
+    	const wordIsNew = !currentRoom.guessed_words[letter].includes(w);
 
     	if (wordIsValid && wordIsNew) {
-	      	currentRoom.guessed_words[targetletter].push(w);
+	      	currentRoom.guessed_words[letter].push(w);
 	      	currentRoom.got_words += 1;
-	      	drawNewWord(document.getElementById(targetletter), w);
+	      	drawNewWord(document.getElementById(letter), w);
 	      	// Update timeout
 	      	currentRoom.endtime = new Date(Date.now() + (60 * 60 * 24 * 1000));
 	    } else if (wordIsNew) {
@@ -154,7 +155,7 @@ function checkGameRoomExists() {
 	} else {
 		loadExistingRoomInfo(roomID);
 		loadWordsVizArea();
-		loadWordList();
+		// loadWordList();
 	}
 }
 
@@ -218,6 +219,12 @@ function getBadRandomID(length = 8) {
   	return res;
 }
 
+function calculateScore(w) {
+	let freq = wordlist_full[currentRoom.wordlist][w.chatAt(0)].indexOf(w);
+	let score = w.length * 10 * (1.0 / (freq+1));
+	return score;
+}
+
 function populateLocalStorage() {
 	currentRoom.updtime = new Date(Date.now());
 	localStorage.setItem("room_ID", currentRoom.room_ID);
@@ -228,19 +235,5 @@ function updateLocalStorage() {
 	localStorage.setItem("room", JSON.stringify(currentRoom));
 }
 
-function loadWordList() {
-	// TODO set up tree 
-	// subtree for each letter?
-	fetch(currentRoom.wordlist + '.txt')
-	  .then((res) => res.text())
-	  .then((text) => {
-	  		// TODO filter out up to difficulty% for each letter
-	    	console.log(wordlist_meta[currentRoom.wordlist]);
-
-	    	// ugly way to test this for now, string lookup lol
-	    	currentWordListRaw = text;
-	   })
-	  .catch((e) => console.error(e));
-}
 
 checkGameRoomExists();
