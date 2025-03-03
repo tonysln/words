@@ -3,10 +3,12 @@ let content = document.getElementById('content');
 let wordInput = document.getElementById('word-input');
 let mainScreen = document.getElementById('main-screen');
 
-
-
 // TODO need a neater way to manage state
 // TODO radix/prefix tree for wordlists
+
+// TODO https://github.com/dwyl/english-words?tab=readme-ov-file
+// TODO move page to recently added word location
+
 let currentRoom = {
 	// Default dummy room before loading from storage/populating from dialog
 	starttime: null,
@@ -31,13 +33,13 @@ let roomIdText = document.getElementById('room-id');
 let roomWordlistText = document.getElementById('selected-wordlist');
 let roomDifficultyText = document.getElementById('selected-difficulty');
 let roomTimeLeftText = document.getElementById('time-left');
+let roomScoreText = document.getElementById('score-field');
 let roomGotWords = document.getElementById('got-words');
 let roomTotalWords = document.getElementById('total-words');
 let roomWordsPercent = document.getElementById('words-percent');
 let roomWrongWords = document.getElementById('wrong-words');
 let resetRoomButton = document.getElementById('reset-room');
 let exportRoomButton = document.getElementById('export-room');
-
 let enterWordButton = document.getElementById('enter-word');
 
 // New game pop dialog
@@ -49,6 +51,7 @@ dDifficultyLabel.textContent = dDifficultySlider.value + '%';
 dDifficultySlider.addEventListener("input", (event) => {
   	dDifficultyLabel.textContent = event.target.value + '%';
 });
+
 document.getElementById('dialog-play-btn').addEventListener("click", (e) => {
   	e.preventDefault();
   	setMainScreenInteractions(true);
@@ -209,6 +212,8 @@ function loadExistingRoomInfo(roomID) {
 	roomTotalWords.textContent = tw;
 	roomWordsPercent.textContent = ((gw/tw)*100).toFixed(2);
 	roomWrongWords.textContent = currentRoom.wrong_words;
+
+	roomScoreText.textContent = currentRoom.score;
 }
 
 function getBadRandomID(length = 8) {
@@ -220,18 +225,18 @@ function getBadRandomID(length = 8) {
 }
 
 function calculateScore(w) {
-	let freq = wordlist_full[currentRoom.wordlist][w.chatAt(0)].indexOf(w);
-	let score = w.length * 10 * (1.0 / (freq+1));
+	let freq = wordlist_full[currentRoom.wordlist][w.charAt(0)].indexOf(w);
+	let score = w.length * 10 * Math.sqrt(1.0 / (freq+1));
 	return score;
 }
 
 function populateLocalStorage() {
-	currentRoom.updtime = new Date(Date.now());
 	localStorage.setItem("room_ID", currentRoom.room_ID);
 	localStorage.setItem("room", JSON.stringify(currentRoom));
 }
 
 function updateLocalStorage() {
+	currentRoom.updtime = new Date(Date.now());
 	localStorage.setItem("room", JSON.stringify(currentRoom));
 }
 
