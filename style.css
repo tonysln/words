@@ -1,7 +1,13 @@
+@font-face {
+  font-family: "Roboto Condensed";
+  src: url("font/RobotoCondensed-VariableFont_wght.ttf");
+}
+
+
 html, body, * {
 	margin: 0;
 	box-sizing: border-box;
-	font-family: "Tahoma";
+	font-family: "Roboto Condensed";
 }
 
 body, h1, h2, h3, h4, h5, h6, p, ol, ul {
@@ -21,15 +27,15 @@ img {
 
 a {
 	text-decoration: none;
-	color: 	#0645ad;
+	color: #7d7d7d;
 }
 
 a:hover {
-	text-decoration: underline;
+	color: #999999;
 }
 
 a:visited {
-	color: #0645ad;
+	color: #7d7d7d;
 }
 
 code {
@@ -54,7 +60,7 @@ body {
 }
 
 #content span {
-/*	font-family: "Georgia";*/
+	font-weight: 300;
 }
 
 .wrapper {
@@ -75,12 +81,12 @@ body {
 .two-col {
 	display: grid;
 	grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
-	grid-column-gap: 2em;
+	grid-column-gap: 1em;
 }
 
 .two-col .col-side {
-	border-left: 1px solid rgb(170, 170, 170);
-	padding-left: 1em;
+	border-left: 1px solid rgba(170, 170, 170, 0.6);
+	padding-left: 0.5em;
 }
 
 .col-side-inner {
@@ -93,6 +99,31 @@ body {
 	padding-right: 0.3em;
 }
 
+.stats-title {
+	background-color: #e8eded;
+	padding: 0.1em 0.2em;
+}
+
+.stats-link {
+	padding: 0.1em 0.2em;
+	background-color: #e8eded;
+	color: #7d7d7d;
+	border-top: 1px solid #c9c9c9;
+	border-bottom: 1px solid #c9c9c9;
+}
+
+.stats-link:not(:last-child) {
+	border-bottom: none;
+}
+
+.stats-link:hover {
+	color: #999999;
+}
+
+.stats-value {
+	padding: 0.2em 0.3em;
+}
+
 .wb-inner {
 	padding: 0.2em 0.2em 0.2em 0.75em;
   	display: flex;
@@ -100,7 +131,7 @@ body {
 }
 
 .wb {
-	padding-bottom: 0.75em;
+	padding-bottom: 1.5em;
 }
 
 .wb h3 {
@@ -113,6 +144,13 @@ body {
 .wb small {
 	opacity: 0.5;
 	padding-left: 0.3em;
+}
+
+.wb > span:first-child {
+	background-color: #e8eded;
+	display: block;
+	width: 100%;
+	padding: 0.1em 0.2em;
 }
 
 .big-input {
