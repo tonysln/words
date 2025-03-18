@@ -183,6 +183,8 @@ function finalizeNewRoom() {
 	currentRoom.wordlist = document.getElementById('dialog-wordlist').value;
 	currentRoom.difficulty = dDifficultySlider.value;
 
+	// TODO limits words based on difficulty %
+
 	currentRoom.total_words = wordlist_meta[currentRoom.wordlist]['_total'];
 	currentRoom.guessed_words = Object.fromEntries(Object.entries(wordlist_meta[currentRoom.wordlist]).map(([k,v]) => [k, []]));
 
