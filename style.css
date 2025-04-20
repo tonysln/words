@@ -1,7 +1,7 @@
 html, body, * {
 	margin: 0;
 	box-sizing: border-box;
-	font-family: "Verdana";
+	font-family: Tahoma;
 	font-size: 10pt;
 }
 
@@ -52,6 +52,7 @@ body {
 }
 
 #content span {
+	font-family: Tahoma;
 	font-weight: 300;
 }
 
@@ -96,18 +97,18 @@ body {
 }
 
 .stats-title {
-	background-color: #e8eded;
+/*	background-color: #e8eded;*/
 	padding: 0.1em 0.2em;
 }
 
 .stats-link {
 	user-select: none;
 	padding: 0;
-	background-color: #e8eded;
+/*	background-color: #e8eded;*/
 	color: #7d7d7d;
-	border-top: 1px solid #c9c9c9;
-	border-bottom: 1px solid #c9c9c9;
-	cursor: default;
+/*	border-top: 1px solid #c9c9c9;*/
+/*	border-bottom: 1px solid #c9c9c9;*/
+	cursor: pointer;
 }
 
 .stats-link:not(:last-child) {
@@ -115,7 +116,7 @@ body {
 }
 
 .stats-link:hover {
-	background-color: #e2e9e9;
+/*	background-color: #e2e9e9;*/
 }
 
 .stats-link a {

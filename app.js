@@ -1,10 +1,11 @@
 // Main elements
-let content = document.getElementById('content');
-let wordInput = document.getElementById('word-input');
-let mainScreen = document.getElementById('main-screen');
+let content = $('#content');
+let wordInput = $('#word-input');
+let mainScreen = $('#main-screen');
 
 // TODO need a neater way to manage state
 // TODO radix/prefix tree for wordlists
+
 
 // TODO https://github.com/dwyl/english-words?tab=readme-ov-file
 // TODO move page to recently added word location
@@ -16,6 +17,7 @@ let currentRoom = {
 	endtime: null,
 	room_ID: "", 
 	wordlist: "frequency_en_50k", 
+	word_meta: null, 
 	guessed_words: {},
 	difficulty: 100.0,
 	got_words: 0,
@@ -29,30 +31,30 @@ let currentRoom = {
 let currentWordListRaw = null;
 
 // Side panel
-let roomIdText = document.getElementById('room-id');
-let roomWordlistText = document.getElementById('selected-wordlist');
-let roomDifficultyText = document.getElementById('selected-difficulty');
-let roomTimeLeftText = document.getElementById('time-left');
-let roomScoreText = document.getElementById('score-field');
-let roomGotWords = document.getElementById('got-words');
-let roomTotalWords = document.getElementById('total-words');
-let roomWordsPercent = document.getElementById('words-percent');
-let roomWrongWords = document.getElementById('wrong-words');
-let resetRoomButton = document.getElementById('reset-room');
-let exportRoomButton = document.getElementById('export-room');
-let enterWordButton = document.getElementById('enter-word');
+let roomIdText = $('#room-id');
+let roomWordlistText = $('#selected-wordlist');
+let roomDifficultyText = $('#selected-difficulty');
+let roomTimeLeftText = $('#time-left');
+let roomScoreText = $('#score-field');
+let roomGotWords = $('#got-words');
+let roomTotalWords = $('#total-words');
+let roomWordsPercent = $('#words-percent');
+let roomWrongWords = $('#wrong-words');
+let resetRoomButton = $('#reset-room');
+let exportRoomButton = $('#export-room');
+let enterWordButton = $('#enter-word');
 
 // New game pop dialog
-let popup = document.getElementById('new-game-popup');
-let dNewId = document.getElementById('dialog-new-id');
-let dDifficultySlider = document.getElementById('dialog-difficulty');
-let dDifficultyLabel = document.getElementById('dialog-difficulty-label');
-dDifficultyLabel.textContent = dDifficultySlider.value + '%';
-dDifficultySlider.addEventListener("input", (event) => {
-  	dDifficultyLabel.textContent = event.target.value + '%';
+let popup = $('#new-game-popup');
+let dNewId = $('#dialog-new-id');
+let dDifficultySlider = $('#dialog-difficulty');
+let dDifficultyLabel = $('#dialog-difficulty-label');
+dDifficultyLabel.text(dDifficultySlider.val() + '%');
+dDifficultySlider.on("input", (event) => {
+  	dDifficultyLabel.text(event.target.val() + '%');
 });
 
-document.getElementById('dialog-play-btn').addEventListener("click", (e) => {
+$('#dialog-play-btn').on("click", (e) => {
   	e.preventDefault();
   	setMainScreenInteractions(true);
   	finalizeNewRoom();
@@ -62,16 +64,16 @@ document.getElementById('dialog-play-btn').addEventListener("click", (e) => {
 
 
 // Process entered words
-enterWordButton.addEventListener('click', (e) => {
+enterWordButton.on('click', (e) => {
 	processWordEntry(e);
 });
 
-wordInput.addEventListener('keydown', (e) => {
+wordInput.on('keydown', (e) => {
 	if (e.key === 'Enter')
 		processWordEntry(e);
 });
 
-resetRoomButton.addEventListener('click', (e) => {
+resetRoomButton.on('click', (e) => {
   	e.preventDefault();
 
   	if (window.confirm("Are you sure you want to reset the game?")) {
@@ -80,7 +82,7 @@ resetRoomButton.addEventListener('click', (e) => {
   	}
 });
 
-exportRoomButton.addEventListener('click', (e) => {
+exportRoomButton.on('click', (e) => {
   	e.preventDefault();
   	console.log(localStorage.getItem("room"));
 });
@@ -89,16 +91,19 @@ exportRoomButton.addEventListener('click', (e) => {
 function processWordEntry(e) {
 	e.preventDefault();
 
-	let w = wordInput.value.trim().toLowerCase();
+	let w = wordInput.val().trim().toLowerCase();
     if (w) {
     	const letter = w.charAt(0);
-    	const wordIsValid = wordlist_full[currentRoom.wordlist][letter].includes(w);
+
+    	// TODO do this in preprocessing
+    	const wordIsValid = wordlist_full[currentRoom.wordlist][letter].slice(0, currentRoom.word_meta[letter]).includes(w);
     	const wordIsNew = !currentRoom.guessed_words[letter].includes(w);
 
     	if (wordIsValid && wordIsNew) {
 	      	currentRoom.guessed_words[letter].push(w);
 	      	currentRoom.got_words += 1;
-	      	drawNewWord(document.getElementById(letter), w);
+	      	drawNewWord($("#"+letter), w);
+	      	updateLetterStats(letter);
 	      	// Update timeout
 	      	currentRoom.endtime = new Date(Date.now() + (60 * 60 * 24 * 1000));
 	    } else if (wordIsNew) {
@@ -107,44 +112,45 @@ function processWordEntry(e) {
 
 	    updateLocalStorage(); // very costly (or will be in the future!)
 	    loadExistingRoomInfo(currentRoom.room_ID); // need that state management upgrade
-	    wordInput.value = '';
+	    wordInput.val('');
     }
 }
 
-
 function drawNewWord(target, w) {
-	const nw = document.createElement('span');
-  	nw.innerText = w;
-  	nw.classList.add('word');
-  	target.appendChild(nw);
+	const nw = $('<span></span>', {text: w, "class": "word"});
+  	target.append(nw);
 }
 
+function updateLetterStats(letter) {
+	const sc = $("#"+letter).prev();
+	const s = $("small", sc);
+	s.text('(' + currentRoom.guessed_words[letter].length + '/' + currentRoom.word_meta[letter] + ')');
+}
+
+function loadLetterStats(letter) {
+	const ndp = $('<div></div>', {"class": "wb"});
+	const nd = $('<div></div>', {"class": "wb-inner", "id": letter});
+	const sc = $('<span></span>');
+	const ct = $('<small></small>', {
+		text: '(' + currentRoom.guessed_words[letter].length + '/' + currentRoom.word_meta[letter] + ')'
+	});
+	const s = $('<h3></h3>', {text: letter.toUpperCase()});
+
+  	sc.append(s);
+  	sc.append(ct);
+  	ndp.append(sc);
+  	ndp.append(nd);
+  	content.append(ndp);  	
+}
 
 function loadWordsVizArea() {
-	const AZ = Object.keys(wordlist_meta[currentRoom.wordlist]).sort().slice(1).join('');
+	const AZ = Object.keys(currentRoom.word_meta).sort().slice(1).join('');
 	for (const letter of AZ) {
-		const ndp = document.createElement('div');
-		ndp.classList.add('wb');
+		loadLetterStats(letter);
 
-		const nd = document.createElement('div');
-		nd.id = letter;
-		nd.classList.add('wb-inner');
-
-		const sc = document.createElement('span');
-		const ct = document.createElement('small');
-		ct.textContent = '(' + currentRoom.guessed_words[letter].length + '/' + wordlist_meta[currentRoom.wordlist][letter] + ')';
-		const s = document.createElement('h3');
-	  	s.textContent = letter.toUpperCase();
-
-	  	sc.appendChild(s);
-	  	sc.appendChild(ct);
-	  	ndp.appendChild(sc);
-	  	ndp.appendChild(nd);
-	  	content.appendChild(ndp);
-
-	  	for (const word of currentRoom.guessed_words[letter]) {
-	  		drawNewWord(document.getElementById(letter), word);
-	  	}
+		for (const word of currentRoom.guessed_words[letter]) {
+  			drawNewWord($("#"+letter), word);
+  		}
 	}
 }
 
@@ -154,7 +160,7 @@ function checkGameRoomExists() {
 		popup.open = true;
 		setMainScreenInteractions(false);
 		currentRoom.room_ID = getBadRandomID();
-		dNewId.innerText = currentRoom.room_ID;
+		dNewId.text(currentRoom.room_ID);
 	} else {
 		loadExistingRoomInfo(roomID);
 		loadWordsVizArea();
@@ -180,42 +186,46 @@ function finalizeNewRoom() {
 	currentRoom.endtime = new Date(now + (60 * 60 * 24 * 1000));
 	currentRoom.updtime = new Date(now);
 
-	currentRoom.wordlist = document.getElementById('dialog-wordlist').value;
-	currentRoom.difficulty = dDifficultySlider.value;
+	currentRoom.wordlist = $('#dialog-wordlist').val();
+	currentRoom.difficulty = dDifficultySlider.val();
 
-	// TODO limits words based on difficulty %
+	// TODO two modes:
+	// 1. use difficulty as cap on words sorted by frequency
+	// 2. use difficulty as a general cap on # of guessed words (much much easier)
+	const dmult = (currentRoom.difficulty / 100.0);
+	currentRoom.word_meta = Object.fromEntries(Object.entries(wordlist_meta[currentRoom.wordlist]).map(([k,v]) => [k, Math.round(v*dmult)]));
 
-	currentRoom.total_words = wordlist_meta[currentRoom.wordlist]['_total'];
-	currentRoom.guessed_words = Object.fromEntries(Object.entries(wordlist_meta[currentRoom.wordlist]).map(([k,v]) => [k, []]));
+	currentRoom.total_words = currentRoom.word_meta['_total'];
+	currentRoom.guessed_words = Object.fromEntries(Object.entries(currentRoom.word_meta).map(([k,v]) => [k, []]));
 
 	populateLocalStorage();
 }
 
 function loadExistingRoomInfo(roomID) {
 	wordInput.focus();
-	roomIdText.textContent = roomID;
+	roomIdText.text(roomID);
 
 	currentRoom = JSON.parse(localStorage.getItem("room"));
 
-	roomWordlistText.textContent = currentRoom.wordlist;
-	roomDifficultyText.textContent = currentRoom.difficulty + '%';
+	roomWordlistText.text(currentRoom.wordlist);
+	roomDifficultyText.text(currentRoom.difficulty + '%');
 
 	currentRoom.updtime = new Date(Date.now());
 	const t1 = new Date(currentRoom.endtime);
 	const dt = Math.round(Math.abs(currentRoom.updtime.getTime() - t1.getTime()) / 3600000);
 	if (dt > 1)
-		roomTimeLeftText.textContent = dt;
+		roomTimeLeftText.text(dt);
 	else
-		roomTimeLeftText.textContent = '<1'
+		roomTimeLeftText.text('<1');
 
 	const gw = parseInt(currentRoom.got_words);
 	const tw = parseInt(currentRoom.total_words);
-	roomGotWords.textContent = gw;
-	roomTotalWords.textContent = tw;
-	roomWordsPercent.textContent = ((gw/tw)*100).toFixed(2);
-	roomWrongWords.textContent = currentRoom.wrong_words;
+	roomGotWords.text(gw);
+	roomTotalWords.text(tw);
+	roomWordsPercent.text(((gw/tw)*100).toFixed(2));
+	roomWrongWords.text(currentRoom.wrong_words);
 
-	roomScoreText.textContent = currentRoom.score;
+	roomScoreText.text(currentRoom.score);
 }
 
 function getBadRandomID(length = 8) {
@@ -243,4 +253,8 @@ function updateLocalStorage() {
 }
 
 
-checkGameRoomExists();
+
+$(function(){
+	checkGameRoomExists();
+	// var App = new AppView;
+});
